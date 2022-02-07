@@ -15,6 +15,16 @@ exports.getToken = function(user) {
     return jwt.sign(user, config.secretKey, {expiresIn: 3600});
 };
 
+exports.verifyAdmin = (req, res, next) => {
+    if (!req.user.admin) {
+        const err = new Error('You are not authorized to perform this opereation!');
+        err.status = 403;
+        next(err);
+    } else {
+        next();
+    }
+}
+
 const opts = {};
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = config.secretKey;
@@ -38,3 +48,4 @@ exports.jwtPassport = passport.use(
 );
 
 exports.verifyUser = passport.authenticate('jwt', {session: false});
+exports.verifyAdmin = passport.authenticate('jwt', {session: false});
